@@ -10,7 +10,7 @@ from SalesLT.Customer sc;
 
 --3. Retrieve customer names and phone numbers
 
-select sc.SalesPerson, 'Hello, '+sc.Title + sc.LastName as CustomerName, sc.Phone
+select sc.SalesPerson, ('Hello, '+sc.Title + sc.LastName) as CustomerName, sc.Phone
 from SalesLT.Customer sc;
 
 -- Challenge 2: Retrieve Customer and Sales Data

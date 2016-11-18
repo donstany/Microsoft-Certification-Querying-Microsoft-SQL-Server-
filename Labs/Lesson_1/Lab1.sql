@@ -2,13 +2,12 @@
 
 -- 1. Retrieve customer details
 -- Familiarize yourself with the Customer table by writing a Transact-SQL query that retrieves all columns for all customers.
-select *
-from SalesLT.Customer;
+SELECT * FROM SalesLT.Customer;
 
 -- 2. Retrieve customer name data
 -- Create a list of all customer contact names that includes the title, first name, middle name (if any), last name, and suffix (if any) of all customers.
-select sc.title, sc.FirstName, sc.MiddleName, sc.LastName, sc.Suffix
-from SalesLT.Customer sc;
+SELECT sc.Title, sc.FirstName, sc.MiddleName, sc.LastName, sc.Suffix
+FROM SalesLT.Customer sc;
 
 -- 3. Retrieve customer names and phone numbers
 -- Each customer has an assigned salesperson. You must write a query to create a call sheet that lists:
@@ -16,14 +15,16 @@ from SalesLT.Customer sc;
 --  A column named CustomerName that displays how the customer contact should be greeted (for example, “Mr Smith”)
 --  The customer’s phone number.
 
-select sc.SalesPerson, sc.Title + sc.LastName as CustomerName, sc.Phone
+SELECT sc.SalesPerson, sc.Title + '' + sc.LastName as CustomerName, sc.Phone
 from SalesLT.Customer sc;
 
+-- ==================================================
 -- Challenge II: Retrieve Customer and Sales Data
+
 
 -- 1. Retrieve a list of customer companies
 -- You have been asked to provide a list of all customer companies in the format <Customer ID> : <Company Name> - for example, 78: Preferred Bikes.
-select CAST(sc.CustomerID AS nvarchar(MAX)) + ': '  + sc.CompanyName 
+SELECT CAST(sc.CustomerID AS varchar) + ': '  + sc.CompanyName AS CustomerCompany
 from SalesLT.Customer sc
 GO
 
@@ -34,6 +35,12 @@ select soh.SalesOrderNumber +'('+
 	   CAST (soh.RevisionNumber AS nvarchar(MAX))+')', CONVERT(VARCHAR(10), soh.OrderDate, 102)
 from SalesLT.SalesOrderHeader soh
 GO
+ -- or
+
+SELECT SalesOrderNumber + ' (' + STR(RevisionNumber, 1) + ')' AS OrderRevision,
+	   CONVERT(nvarchar(30), OrderDate, 102) AS OrderDate
+FROM SalesLT.SalesOrderHeader;
+-- ========================================================
 
 -- Challenge III: Retrieve Customer Contact Details
 
@@ -42,8 +49,9 @@ GO
 -- The list must consist of a single field in the format <first name> <last name> (for example Keith Harris) if the middle name is unknown,
 -- or <first name> <middle name> <last name> (for example Jane M. Gates) if a middle name is stored in the database.
 
-SELECT sc.FirstName + ' '
-       + ISNULL(sc.MiddleName, '') + ' '
+-- Get middle names if known
+SELECT sc.FirstName + ''
+       + ISNULL(sc.MiddleName + ' ', '')
 	   + ISNULL(sc.LastName, '') 
 FROM SalesLT.Customer AS sc;
 
@@ -53,9 +61,14 @@ FROM SalesLT.Customer AS sc;
 -- if not, then the phone number should be used. 
 -- You must write a query that returns a list of customer IDs in one column, 
 -- and a second column named PrimaryContact that contains the email address if known, and otherwise the phone number.
+
+-- Get primary contact details
 Execute first:
 UPDATE SalesLT.Customer SET EmailAddress = NULL WHERE CustomerID % 7 = 1;
 
+SELECT sc.CustomerID, COALESCE(EmailAddress,Phone) AS PrimaryContact
+FROM SalesLT.Customer;
+--or 
 SELECT sc.CustomerID,
 	   ISNULL(sc.EmailAddress,sc.Phone) as PrimaryContact
 FROM SalesLT.Customer AS sc;
